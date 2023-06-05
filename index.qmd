@@ -61,6 +61,102 @@ You can download the slides from
 
 # Recap {background-color="black"}
 
+
+## Gene Function: the Gene Ontology Project
+
+::: {style="font-size: 70%"}
+
+![](fig/go-logo.png){width="auto" fig-align="center" style="max-width: 400px"}
+
+- The GO project has $\sim$ 43,000 validated terms, $\sim$ 7.4M
+  annotations on $\sim$ 5,200 species.
+
+- About $\sim$ 700,000 annotations are on human genes.
+
+- Only half of the human gene annotations are based on experimental
+  evidence.
+
+- About $\sim$ 173,000 publications have used the GO.
+
+- GO annotations provide valuable information for many downstream
+  applications, **e.g.**, contextualizing -omics analyses.
+
+**source**: Statistics from
+<http://pantherdb.org/panther/summaryStats.jsp> and
+<http://geneontology.org/stats.html>
+
+
+:::
+
+## Gene Functions
+
+::: {.columns}
+::: {.column width="30%" .rectangle .fragment .fade-down}
+Molecular Function<br>
+[Active transport GO:0005215](http://amigo.geneontology.org/amigo/term/GO:0005215){target="_blank" fig-align="center"}
+
+![](fig/Sodium-potassium_pump_and_diffusion.png){width="auto" fig-align="center"}
+
+:::
+::: {.column width="30%" .rectangle .fragment .fade-down}
+Cellular Component<br>
+[Mitochondria GO:0004016](http://amigo.geneontology.org/amigo/term/GO:0004016){target="_blank" fig-align="center"}
+
+![](fig/640px-Animal_Cell-svg.png){width="auto" fig-align="center"}
+
+:::
+::: {.column width="30%" .rectangle .fragment .fade-down}
+Biological Process<br>
+[Heart contraction GO:0060047](http://amigo.geneontology.org/amigo/term/GO:0060047){target="_blank" fig-align="center"}
+
+![](fig/Systolevs_Diastole.png){width="auto" fig-align="center"}
+
+:::
+:::
+
+## Predicting Function: State-of-the-art
+
+::: {style="font-size: 55%"}
+
+Sequences, phylogenomics, and ML.
+
+::: {.fragment .fade-up}
+- **BLAST**: Prediction by sequence homology ($\sim$ 105,000 citations) [@altschulBasicLocalAlignment1990].
+:::
+
+::: {.fragment .fade-up}
+- **SIFTER**: An evolutionary model of gene function/loss using
+  phylogenetics [@Engelhardt2005].
+:::
+
+::: {.fragment .fade-up}
+- **aphylo** (by yours truly): Another phylo-based method. Leverages
+  negative annotations and pooled trees [@VegaYon2021].
+:::
+
+::: {.fragment .fade-up}
+- **Phylo-PFP**: A BLAST-based adding phylogenetic based distances [@Jain2019].
+:::
+
+::: {.fragment .fade-up}
+- **DeepGOPlus**: One of the top-performing models in the literature,
+  uses a 2D convolutional neural network on gene sequences[@kulmanovDeepGOPlusImprovedProtein2019].
+:::
+
+::: {.fragment .fade-up}
+- **GOLabeler**: Top performing tool according to the *Critical
+  Assessment of Function Annotation* \[CAFA\] challenge is an ensemble
+  of various simple ML methods, including K-means and logistic
+  regression [@youGOLabelerImprovingSequencebased2018].
+:::
+
+::: {.fragment .fade-up}
+- **DeepFRI**: Uses Graph Convolutional Neural Networks (GCNs) to
+  predict function based on protein structure and genetic sequence [@gligorijevicStructurebasedProteinFunction2021].
+:::
+
+:::
+
 ## Starting point
 
 ::: {style="font-size: 70%"}
@@ -98,7 +194,7 @@ using phylogenetic trees to predict gene function.
 
 The key difference between the models is how they model the transition from parent to offspring: $\mathbb{P}\left(x_n\to x_o\right)$
 
-::: {.column width="25%" .rectangle .fragment .fade-up fragment-index="1"}
+::: {.column width="30%" .rectangle .fragment .fade-up fragment-index="1"}
 <text style="font-size:200%;font-weight:bold">[aphylo {{< fa brands r-project >}}](https://cran.r-project.org/package=aphylo)</text>
 
 - Fixed gain/loss rates.
@@ -108,7 +204,7 @@ The key difference between the models is how they model the transition from pare
 ![](fig/aphylo-equation-transition.svg){width="100%"}
 :::
 
-::: {.column width="25%" .rectangle .fragment .fade-up fragment-index="3"}
+::: {.column width="30%" .rectangle .fragment .fade-up fragment-index="3"}
 <text style="font-size:200%;font-weight:bold">[aphylo2 {{< fa brands github >}}](https://github.com/UofUEpiBio/aphylo2)</text>
 
 - Event-specific gain/loss rates.
@@ -118,7 +214,7 @@ The key difference between the models is how they model the transition from pare
 ![](fig/aphylo2-equation-transition.svg){width="100%"}
 :::
 
-::: {.column width="25%" .rectangle .fragment .fade-up fragment-index="2"}
+::: {.column width="30%" .rectangle .fragment .fade-up fragment-index="2"}
 <text style="font-size:200%;font-weight:bold">[GEESE {{< fa brands github >}}](https://github.com/USCbiostats/geese)</text>
 
 - Event-specific gain/loss rates.
@@ -147,14 +243,18 @@ The key difference between the models is how they model the transition from pare
 :::
 
 ::: {.fragment .fade-up}
-- One way to model this is using a Markov Transition Model (as in
-  SIFTER [@Engelhardt2011]).
+- One way to model this is using a Markov Transition Model [@Engelhardt2011].
 :::
 
 :::
 
 ![A key part of molecular innovation, gene duplication provides an opportunity for new functions to emerge (<a href="https://en.wikipedia.org/wiki/File:Evolution_fate_duplicate_genes_-_vector.svg">wikimedia</a>)](fig/Evolution_fate_duplicate_genes_-_vector.svg){width="80%" fig-align="center"}
 
+## Sufficient statistics
+
+Characterizing the evolution of gene function using sufficient statistics.
+
+![](fig/example-suff-stats.png){width="70%" fig-align="center"}
 
 ## GEESE: **GE**ne functional **E**volution using **S**ufici**E**ncy
 
@@ -186,6 +286,8 @@ Model fully implemented in C++ and R. It already shows great promise:
 - Most trees aren't fully-reconciled: GEESE's complexity grows exponentially with the number of offspring in the tree.
 
 - Negative assertions (gene `NOT` associated with) are rare... but Christopher has made good progress using taxon constraints.
+
+- Comparing with other methods: Very difficult because of the lack of reproducibility.
 :::
 
 :::
@@ -194,21 +296,22 @@ Model fully implemented in C++ and R. It already shows great promise:
 
 ## Goals
 
-::: {style="font-size: 70%"}
-
-::: {.fragment .fade-up}
+::: {style="font-size: 65%"}
 
 ### Manuscripts
 
+::: {.fragment .fade-up}
 - The GEESE paper is about 80% done. We ~~need to~~will finish it this year.
-
-- Low-hanging fruit: aphylo2 can be submitted to PLOS Comp. Bio. using aphylo (a software prototype is up and running).
 :::
 
 ::: {.fragment .fade-up}
+- Low-hanging fruit: aphylo2 can be submitted to PLOS Comp. Bio. using aphylo (a software prototype is up and running).
+:::
+
 ### Collaboration (ideas)
 
-- Augment -omics data with GEESE (*à la carte*): Use GEESE on a gene list to make predictions, then use those predictions as additional -omics data.
+::: {.fragment .fade-up}
+- Augment -omics data with GEESE (*à la carte*): Use GEESE on a gene list to make predictions, then use those predictions as additional -omics data (*i.e.*, beyond ad-hoc post-analysis).
 
 ```{mermaid}
 %%| fig-width: 100%
@@ -221,8 +324,14 @@ graph LR
   %%classDef mybox fill:darkred,color:#fff,stroke:white,stroke-width:0px;
   %%class a,b,c,d mybox;
 ```
+:::
 
-- GEESE is built on top of Discrete Exponential-Family Models (DEMs). We could use them to model other things (**e.g.**, correlated binary outcomes) [@vegayonDiscreteExponentialFamilyModels2022].
+::: {.fragment .fade-up}
+- Or use predictions from other projects as features in GEESE.
+:::
+
+::: {.fragment .fade-up}
+- GEESE is built on top of Discrete Exponential-Family Models (DEMs). We could use them to model other things (*e.g.*, correlated binary outcomes) [@vegayonDiscreteExponentialFamilyModels2022].
 :::
 
 :::

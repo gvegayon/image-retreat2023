@@ -17,3 +17,5 @@
 *.synctex.gz
 
 
+
+/.luarc.json
